@@ -78,7 +78,7 @@ public class CompetitorAI implements AI {
 			}
 			return;
 		}
-		else{ //Wizard cant see anything... Move toward enemy base
+		else{ //Wizard cant see anything... Move in random direction for as long as possible
 			int myTeam = state.getMyTeamNumber();
 			int players = state.getNumberOfPlayers();
 			int attackTeam = 0;
@@ -88,7 +88,7 @@ public class CompetitorAI implements AI {
 					break;
 				}
 			}
-	
+
 			Node enemyBase = state.getBase(attackTeam);
 			path = wizard.getDirection(enemyBase, pathWeight);
 			wizard.move(path);
@@ -178,7 +178,8 @@ public class CompetitorAI implements AI {
 		}
 	}
 	
-	// Given an actor, it returns the closest neutral actor.
+	
+	
 	private ArrayList<Node> closestNeutral(AIGameState state, Actor self) {		
 		int pathLength = 1000;
 		ArrayList<Node> shortestPath = null;
@@ -194,7 +195,6 @@ public class CompetitorAI implements AI {
 		return shortestPath;
 	}
 	
-	// Given two actors, it returns the closest of type target
 	private ArrayList<Node> closestNeutralTarget(AIGameState state, Actor self, int target) {		
 		int pathLength = 1000;
 		ArrayList<Node> shortestPath = null;
@@ -211,6 +211,4 @@ public class CompetitorAI implements AI {
 		}
 		return shortestPath;
 	}
-	
-	
 }

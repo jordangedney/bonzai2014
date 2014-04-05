@@ -25,130 +25,88 @@ public class CompetitorAI implements AI {
 	}
 
 
+
+
 	/**
 	 * Move or castMagic with your Wizard
 	 * @param state
 	 */
 	private void moveWizard(AIGameState state) {
-		Wizard wizard = state.getMyWizard();
 		Actor closest;
+		Wizard wizard = state.getMyWizard();
 
+		//Move towards enemy blockers and cast if can
 		closest = closestEnemyBlocker(state, wizard);
-		if(closest != null){ //Move towards enemy blockers and cast if can
-			
-			if(wizard.canCast(closest)){
-				wizard.castMagic(closest);
-			}
-			else{
-				path = wizard.getDirection(closest.getLocation(), pathWeight);
-				wizard.move(path);
-			}
-			return;
-		}
+		moveAndCast(state, closest);
+		if(closest != null) { return; }
 
+		//Move towards neutral blockers and cast if can
 		closest = closestNeutralBlocker(state, wizard);
-		if(closest != null){ //Move towards neutral blockers and cast if can
-				
-			if(wizard.canCast(closest)){
-				wizard.castMagic(closest);
-			}
-			else{
-				path = wizard.getDirection(closest.getLocation(), pathWeight);
-				wizard.move(path);
-			}
-			return;
-		}
+		moveAndCast(state, closest);
+		if(closest != null) { return; }
 
+		//Get neutral hats
 		closest = closestNeutralHat(state, wizard);
-		if(closest != null){  //Get neutral hats
-				
-			if(wizard.canCast(closest)){
-				wizard.castMagic(closest);
-			}
-			else{
-				path = wizard.getDirection(closest.getLocation(), pathWeight);
-				wizard.move(path);
-			}
-				
-			return;
-		}
-		
+		moveAndCast(state, closest);
+		if(closest != null) { return; }
+
+		//Get neutral scout
 		closest = closestNeutralScout(state, wizard);
-		if(closest != null){  //Get neutral scout
-				
-			if(wizard.canCast(closest)){
-				wizard.castMagic(closest);
-			}
-			else{
-				path = wizard.getDirection(closest.getLocation(), pathWeight);
-				wizard.move(path);
-			}
-				
-			return;
-		}
+		moveAndCast(state, closest);
+		if(closest != null) { return; }
 
-
+		//Get neutral scout
 		closest = closestNeutralCleaner(state, wizard);
-		if(closest != null){  //Get neutral scout
-				
-			if(wizard.canCast(closest)){
-				wizard.castMagic(closest);
-			}
-			else{
-				path = wizard.getDirection(closest.getLocation(), pathWeight);
-				wizard.move(path);
-			}
-				
-			return;
-		}
-		
-		
-		
-		else{ //Wizard cant see anything... Move in random direction for as long as possible
-			int myTeam = state.getMyTeamNumber();
-			int players = state.getNumberOfPlayers();
-			ArrayList<Node> enemyBases = new ArrayList<Node>();
-			for(int i = 1; i <= players; i++){
-				if(i != myTeam){
-					enemyBases.add(state.getBase(i));
-				}
-			}
+		moveAndCast(state, closest);
+		if(closest != null) { return; }
 
-			Node enemyBase = enemyBases.get(0);
-			int maxHatCount = 0;
-			int hatCount = 0;
-			for(Node base : enemyBases){
-				ArrayList<Actor> hats = base.getActors();
-				for(Actor hat : hats){
-					if(hat.getType() == Actor.HAT){
-						hatCount++;
-					}
-				}
-				if(hatCount > maxHatCount){
-					maxHatCount = hatCount;
-					enemyBase = base;
-				}
-				hatCount = 0;
-			}
 
-			path = wizard.getDirection(enemyBase, pathWeight);
-			wizard.move(path);
-
-			ArrayList<Actor> enemyHat = enemyBase.getActors();
-			for(Actor hat : enemyHat){
-				if(hat.getType() == Actor.HAT && hat.getTeam() != myTeam){
-					if(wizard.isAdjacent(hat) || wizard.getLocation() == enemyBase){
-						wizard.castMagic(hat);
-					}
-					else{
-						path = wizard.getDirection(hat.getLocation(), pathWeight);
-						wizard.move(path);
-					}
-				}
+		//Wizard cant see anything... Move in random direction for as long as possible
+		int myTeam = state.getMyTeamNumber();
+		int players = state.getNumberOfPlayers();
+		ArrayList<Node> enemyBases = new ArrayList<Node>();
+		for(int i = 1; i <= players; i++){
+			if(i != myTeam){
+				enemyBases.add(state.getBase(i));
 			}
 		}
 
+		Node enemyBase = enemyBases.get(0);
+		int maxHatCount = 0;
+		int hatCount = 0;
+		for(Node base : enemyBases){
+			ArrayList<Actor> hats = base.getActors();
+			for(Actor hat : hats){
+				if(hat.getType() == Actor.HAT){
+					hatCount++;
+				}
+			}
+			if(hatCount > maxHatCount){
+				maxHatCount = hatCount;
+				enemyBase = base;
+			}
+			hatCount = 0;
+		}
+
+		path = wizard.getDirection(enemyBase, pathWeight);
+		wizard.move(path);
+
+		ArrayList<Actor> enemyHat = enemyBase.getActors();
+		for(Actor hat : enemyHat){
+			if(hat.getType() == Actor.HAT && hat.getTeam() != myTeam){
+				if(wizard.isAdjacent(hat) || wizard.getLocation() == enemyBase){
+					wizard.castMagic(hat);
+				}
+				else{
+					path = wizard.getDirection(hat.getLocation(), pathWeight);
+					wizard.move(path);
+				}
+			}
+		}
 	}
+
+
+
 
 	/**
 	 * Move, block, or unBlock with your blockers.
@@ -240,89 +198,102 @@ public class CompetitorAI implements AI {
 
 
 
-// Given an actor (self),  an arraylist of actors, and an int target,
-// it will return the closest actor to self, from actors of type target.
-private Actor closestNeutralHat(AIGameState state, Actor self) {		
-	int pathLength = 1000;
-	Actor closestActor = null;
-	ArrayList<Node> shortestPath = null;
-	for(Actor actor: state.getNeutralHats()){
-		ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
-		if(newPath.size() < pathLength){
-			shortestPath = newPath;
-			pathLength = newPath.size();
-			closestActor = actor;
+	// Given an actor (self),  an arraylist of actors, and an int target,
+	// it will return the closest actor to self, from actors of type target.
+	private Actor closestNeutralHat(AIGameState state, Actor self) {		
+		int pathLength = 1000;
+		Actor closestActor = null;
+		ArrayList<Node> shortestPath = null;
+		for(Actor actor: state.getNeutralHats()){
+			ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
+			if(newPath.size() < pathLength){
+				shortestPath = newPath;
+				pathLength = newPath.size();
+				closestActor = actor;
+			}
+
 		}
-			
+		return closestActor;
 	}
-	return closestActor;
-}
 
 
-private Actor closestEnemyBlocker(AIGameState state, Actor self) {		
-	int pathLength = 1000;
-	Actor closestActor = null;
-	ArrayList<Node> shortestPath = null;
-	for(Actor actor: state.getEnemyBlockers()){
-		ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
-		if(newPath.size() < pathLength){
-			shortestPath = newPath;
-			pathLength = newPath.size();
-			closestActor = actor;
+	private Actor closestEnemyBlocker(AIGameState state, Actor self) {		
+		int pathLength = 1000;
+		Actor closestActor = null;
+		ArrayList<Node> shortestPath = null;
+		for(Actor actor: state.getEnemyBlockers()){
+			ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
+			if(newPath.size() < pathLength){
+				shortestPath = newPath;
+				pathLength = newPath.size();
+				closestActor = actor;
+			}
+
 		}
-			
+		return closestActor;
 	}
-	return closestActor;
-}
 
-private Actor closestNeutralBlocker(AIGameState state, Actor self) {		
-	int pathLength = 1000;
-	Actor closestActor = null;
-	ArrayList<Node> shortestPath = null;
-	for(Actor actor: state.getNeutralBlockers()){
-		ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
-		if(newPath.size() < pathLength){
-			shortestPath = newPath;
-			pathLength = newPath.size();
-			closestActor = actor;
+	private Actor closestNeutralBlocker(AIGameState state, Actor self) {		
+		int pathLength = 1000;
+		Actor closestActor = null;
+		ArrayList<Node> shortestPath = null;
+		for(Actor actor: state.getNeutralBlockers()){
+			ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
+			if(newPath.size() < pathLength){
+				shortestPath = newPath;
+				pathLength = newPath.size();
+				closestActor = actor;
+			}
+
 		}
-			
+		return closestActor;
 	}
-	return closestActor;
-}
 
 
-private Actor closestNeutralScout(AIGameState state, Actor self) {		
-	int pathLength = 1000;
-	Actor closestActor = null;
-	ArrayList<Node> shortestPath = null;
-	for(Actor actor: state.getNeutralScouts()){
-		ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
-		if(newPath.size() < pathLength){
-			shortestPath = newPath;
-			pathLength = newPath.size();
-			closestActor = actor;
+	private Actor closestNeutralScout(AIGameState state, Actor self) {		
+		int pathLength = 1000;
+		Actor closestActor = null;
+		ArrayList<Node> shortestPath = null;
+		for(Actor actor: state.getNeutralScouts()){
+			ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
+			if(newPath.size() < pathLength){
+				shortestPath = newPath;
+				pathLength = newPath.size();
+				closestActor = actor;
+			}
+
 		}
-			
+		return closestActor;
 	}
-	return closestActor;
-}
 
 
-private Actor closestNeutralCleaner(AIGameState state, Actor self) {		
-	int pathLength = 1000;
-	Actor closestActor = null;
-	ArrayList<Node> shortestPath = null;
-	for(Actor actor: state.getNeutralCleaners()){
-		ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
-		if(newPath.size() < pathLength){
-			shortestPath = newPath;
-			pathLength = newPath.size();
-			closestActor = actor;
+	private Actor closestNeutralCleaner(AIGameState state, Actor self) {		
+		int pathLength = 1000;
+		Actor closestActor = null;
+		ArrayList<Node> shortestPath = null;
+		for(Actor actor: state.getNeutralCleaners()){
+			ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
+			if(newPath.size() < pathLength){
+				shortestPath = newPath;
+				pathLength = newPath.size();
+				closestActor = actor;
+			}
+
 		}
-			
+		return closestActor;
 	}
-	return closestActor;
-}
 
+	private void moveAndCast(AIGameState state, Actor closest){
+		Wizard wizard = state.getMyWizard();
+		if(closest != null){
+			if(wizard.canCast(closest)){
+				wizard.castMagic(closest);
+			}
+			else{
+				path = wizard.getDirection(closest.getLocation(), pathWeight);
+				wizard.move(path);
+			}
+			return;
+		}
+	}
 }

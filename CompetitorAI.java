@@ -13,7 +13,24 @@ public class CompetitorAI implements AI {
 	 */
 	@Override
 	public void takeTurn(AIGameState state) {
+		Wizard wizard = state.getMyWizard();
 		
+		//Get all of your actors
+		for(Actor a : state.getMyActors()) {
+			if(!(a instanceof Wizard)) {
+				
+				if(wizard.canCast(a)) {
+					if(wizard.castMagic(a)) {
+						wizard.shout("abracadabra");
+					}
+				}
+			}
+
+			if(a.isStunned()) {
+				a.shout("**Ouch**");
+			}
+		}
+
 		this.moveWizard(state);
 		this.moveBlockers(state);
 		this.moveCleaners(state);

@@ -206,7 +206,7 @@ public class CompetitorAI implements AI {
 	// Given an actor (self),  an arraylist of actors, and an int target,
 	// it will return the closest actor to self, from actors of type target.
 	private Actor closestEnemyHat(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getEnemyHats()){
@@ -224,7 +224,7 @@ public class CompetitorAI implements AI {
 	// Given an actor (self),  an arraylist of actors, and an int target,
 	// it will return the closest actor to self, from actors of type target.
 	private Actor closestNeutralHat(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getNeutralHats()){
@@ -241,7 +241,7 @@ public class CompetitorAI implements AI {
 
 
 	private Actor closestEnemyBlocker(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getEnemyBlockers()){
@@ -257,7 +257,7 @@ public class CompetitorAI implements AI {
 	}
 
 	private Actor closestNeutralBlocker(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getNeutralBlockers()){
@@ -274,7 +274,7 @@ public class CompetitorAI implements AI {
 
 
 	private Actor closestNeutralScout(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getNeutralScouts()){
@@ -291,7 +291,7 @@ public class CompetitorAI implements AI {
 
 
 	private Actor closestNeutralCleaner(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getNeutralCleaners()){

@@ -29,9 +29,10 @@ public class CompetitorAI implements AI {
 	 */
 	private void moveWizard(AIGameState state) {
 		Wizard wizard = state.getMyWizard();
-		List<Hat> neutralHats = state.getNeutralHats();
 		
-		if(neutralHats.size() != 0){
+		if(state.getNeutralHats().size() != 0){ //Move towards neutral hats and cast if can
+			List<Hat> neutralHats = state.getNeutralHats();
+			
 			if(wizard.isAdjacent(neutralHats.get(0))){
 				wizard.castMagic(neutralHats.get(0));
 			}
@@ -39,30 +40,48 @@ public class CompetitorAI implements AI {
 				path = wizard.getDirection(neutralHats.get(0).getLocation(), pathWeight);
 				wizard.move(path);
 			}
+			return;
 		}
-		else{
-			if(last == 0){
-				wizard.move(Node.RIGHT);
-				//last = 1;
+		else if(state.getNeutralScouts().size() != 0){ //Move towards neutral scouts and cast if can
+			List<Scout> scouts = state.getNeutralScouts();
+			
+			if(wizard.isAdjacent(scouts.get(0))){
+				wizard.castMagic(scouts.get(0));
 			}
-			else if(last == 1){
-				wizard.move(Node.UP);
-				last = 0;
+			else{
+				path = wizard.getDirection(scouts.get(0).getLocation(), pathWeight);
+				wizard.move(path);
 			}
+			return;
+		}
+		else if(state.getNeutralBlockers().size() != 0){ //Move towards neutral blockers and cast if can
+			List<Blocker> blockers = state.getNeutralBlockers();
+			
+			if(wizard.isAdjacent(blockers.get(0))){
+				wizard.castMagic(blockers.get(0));
+			}
+			else{
+				path = wizard.getDirection(blockers.get(0).getLocation(), pathWeight);
+				wizard.move(path);
+			}
+			return;
+		}
+		else if(state.getNeutralCleaners().size() != 0){ //Move towards neutral cleaners and cast if can
+			List<Cleaner> cleaners = state.getNeutralCleaners();
+			
+			if(wizard.isAdjacent(cleaners.get(0))){
+				wizard.castMagic(cleaners.get(0));
+			}
+			else{
+				path = wizard.getDirection(cleaners.get(0).getLocation(), pathWeight);
+				wizard.move(path);
+			}
+			return;
+		}
+		else{ //Wizard cant see anything... Move in random direction for as long as possible
+			wizard.shout("I dont know what to do!!");
 		}
 		
-		//Iterate through all visible enemy actors
-				for(Actor e : state.getEnemyActors()) {
-					if(wizard.canCast( e)) {
-						wizard.castMagic(e);
-					}
-				}
-				
-				for(Actor e : state.getNeutralActors()) {
-					if(wizard.canCast(e)) {
-						wizard.castMagic(e);
-					}
-				}
 	}
 	
 	/**

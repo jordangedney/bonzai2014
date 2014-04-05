@@ -36,11 +36,12 @@ public class CompetitorAI implements AI {
 		Wizard wizard = state.getMyWizard();
 
 		if(state.getMyMana() > 200){
-			//Move towards enemy blockers and cast if can
-			closest = closestEnemyBlocker(state, wizard);
-			moveAndCast(state, closest);
-			if(closest != null) { return; }
+		//Move towards enemy blockers and cast if can
+		closest = closestEnemyBlocker(state, wizard);
+		moveAndCast(state, closest);
+		if(closest != null) { return; }
 		}
+		
 
 		//Move towards neutral blockers and cast if can
 		closest = closestNeutralBlocker(state, wizard);
@@ -114,51 +115,28 @@ public class CompetitorAI implements AI {
 
 
 
+
 	/**
 	 * Move, block, or unBlock with your blockers.
-	 * 
 	 * @param state
 	 */
 	private void moveBlockers(AIGameState state) {
-		for (Blocker blocker : state.getMyBlockers()) {
+		for(Blocker blocker : state.getMyBlockers()) {			
 			// Target, and attack enemy wizards.
-			// This needs to be changed to the closest wizard.
-			// This code will break for more than one wizard on screen.
-			if (state.getEnemyWizards().size() > 0) {
-				Actor wizard = closestWizard(state, blocker);
-					Node wizardLocation = wizard.getLocation();
-					int moveDirection = blocker.getDirection(wizardLocation,
-							pathWeight);
+			//This needs to be changed to the closest wizard.
+			//This code will break for more than one wizard on screen.
+			for(Wizard wizard: state.getEnemyWizards()){
+				Node wizardLocation = wizard.getLocation();
+				int moveDirection = blocker.getDirection(wizardLocation, pathWeight);
 
-					// If a blocker is on top of a wizard, block, else, move
-					// towards it.
-					if (blocker.getLocation().equals(wizard.getLocation())) {
-						if (!blocker.getLocation().equals(state.getMyWizard())) {
-							blocker.block();
-						}
-					} else {
-						blocker.move(moveDirection);
+				// If a blocker is on top of a wizard, block, else, move towards it.
+				if(blocker.getLocation().equals(wizard.getLocation())) {
+					if(!blocker.getLocation().equals(state.getMyWizard())){
+						blocker.block();	
 					}
-				}
-			
-			else{
-				
-				ArrayList<Node> enemyBases = new ArrayList<Node>();
-				for(int i = 1; i <= state.getNumberOfPlayers(); i++){
-					if(i != state.getMyTeamNumber()){
-						enemyBases.add(state.getBase(i));
-					}
-				}
-				//path = blocker.getDirection(enemyBases.get( ((int)Math.random()*enemyBases.size())), pathWeight);
-				path = blocker.getDirection(enemyBases.get(1) , pathWeight);
-				System.out.println("path = " +path);
-				if(blocker.isBlocking()){
-					blocker.unBlock();
-				}
-				else{
-					blocker.move(path);
-				}
-				//blocker.shout("dssdf");
+				} else {
+					blocker.move(moveDirection);
+				}	
 			}
 		}
 
@@ -229,7 +207,7 @@ public class CompetitorAI implements AI {
 	// Given an actor (self),  an arraylist of actors, and an int target,
 	// it will return the closest actor to self, from actors of type target.
 	private Actor closestEnemyHat(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getEnemyHats()){
@@ -247,7 +225,7 @@ public class CompetitorAI implements AI {
 	// Given an actor (self),  an arraylist of actors, and an int target,
 	// it will return the closest actor to self, from actors of type target.
 	private Actor closestNeutralHat(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getNeutralHats()){
@@ -264,7 +242,7 @@ public class CompetitorAI implements AI {
 
 
 	private Actor closestEnemyBlocker(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getEnemyBlockers()){
@@ -280,7 +258,7 @@ public class CompetitorAI implements AI {
 	}
 
 	private Actor closestNeutralBlocker(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getNeutralBlockers()){
@@ -297,7 +275,7 @@ public class CompetitorAI implements AI {
 
 
 	private Actor closestNeutralScout(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getNeutralScouts()){
@@ -314,7 +292,7 @@ public class CompetitorAI implements AI {
 
 
 	private Actor closestNeutralCleaner(AIGameState state, Actor self) {		
-		int pathLength = 1000;
+		int pathLength = Integer.MAX_VALUE;
 		Actor closestActor = null;
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getNeutralCleaners()){
@@ -328,24 +306,6 @@ public class CompetitorAI implements AI {
 		}
 		return closestActor;
 	}
-	
-	
-	private Actor closestWizard(AIGameState state, Actor self) {		
-		int pathLength = 1000;
-		Actor closestActor = null;
-		ArrayList<Node> shortestPath = null;
-		for(Actor actor: state.getEnemyWizards()){
-			ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
-			if(newPath.size() < pathLength){
-				shortestPath = newPath;
-				pathLength = newPath.size();
-				closestActor = actor;
-			}
-
-		}
-		return closestActor;
-	}
-	
 
 	private void moveAndCast(AIGameState state, Actor closest){
 		Wizard wizard = state.getMyWizard();
@@ -360,7 +320,4 @@ public class CompetitorAI implements AI {
 			return;
 		}
 	}
-	
-	
-	
 }

@@ -153,12 +153,17 @@ public class CompetitorAI implements AI {
 	 * @param state
 	 */
 	private void moveScouts(AIGameState state) {
+		
 		for(Scout scout : state.getMyScouts()) {
-			if(Math.random() > .8) { //80% chance to move randomly
-				scout.doubleMove((int)(Math.random()*4), (int)(Math.random()*4));
-			} else { //20% chance to move closer to your base.
-				scout.doubleMove(state.getPath(scout, state.getMyBase(), pathWeight));
+			
+			if(state.getNeutralHats().size() != 0){ //Check to see if scout can see a hat, if so move towards it and stay there
+				ArrayList<Node> path = closestNeutralTarget(state, scout, Actor.HAT);
+				scout.doubleMove(path);
 			}
+			
+			else{ //Move randomly
+				scout.doubleMove((int)(Math.random()*4), (int)(Math.random()*4));
+			} 
 		}
 	}
 	

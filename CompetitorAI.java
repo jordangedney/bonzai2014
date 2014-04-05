@@ -35,16 +35,23 @@ public class CompetitorAI implements AI {
 		Actor closest;
 		Wizard wizard = state.getMyWizard();
 
-		//Move towards enemy blockers and cast if can
-		closest = closestEnemyBlocker(state, wizard);
-		moveAndCast(state, closest);
-		if(closest != null) { return; }
+		if(wizard.getMana() > 200){
+			//Move towards enemy blockers and cast if can
+			closest = closestEnemyBlocker(state, wizard);
+			moveAndCast(state, closest);
+			if(closest != null) { return; }
+		}
 
 		//Move towards neutral blockers and cast if can
 		closest = closestNeutralBlocker(state, wizard);
 		moveAndCast(state, closest);
 		if(closest != null) { return; }
 
+		//Get neutral hats
+		closest = closestEnemyHat(state, wizard);
+		moveAndCast(state, closest);
+		if(closest != null) { return; }
+		
 		//Get neutral hats
 		closest = closestNeutralHat(state, wizard);
 		moveAndCast(state, closest);
@@ -196,7 +203,23 @@ public class CompetitorAI implements AI {
 	}
 
 
+	// Given an actor (self),  an arraylist of actors, and an int target,
+	// it will return the closest actor to self, from actors of type target.
+	private Actor closestEnemyHat(AIGameState state, Actor self) {		
+		int pathLength = 1000;
+		Actor closestActor = null;
+		ArrayList<Node> shortestPath = null;
+		for(Actor actor: state.getEnemyHats()){
+			ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
+			if(newPath.size() < pathLength){
+				shortestPath = newPath;
+				pathLength = newPath.size();
+				closestActor = actor;
+			}
 
+		}
+		return closestActor;
+	}
 
 	// Given an actor (self),  an arraylist of actors, and an int target,
 	// it will return the closest actor to self, from actors of type target.

@@ -97,10 +97,20 @@ public class CompetitorAI implements AI {
 	 */
 	private void moveBlockers(AIGameState state) {
 		for(Blocker blocker : state.getMyBlockers()) {
-			if(Math.random() > .5) { 	//50% chance to use block()
-				blocker.block();
-			} else {					//50% chance to use unBlock()
-				blocker.unBlock();
+			
+			// Target, and attack enemy wizards.
+			//This needs to be changed to the closest wizard.
+			//This code will break for more than one wizard on screen.
+			for(Wizard wizard: state.getEnemyWizards()){
+				Node wizardLocation = wizard.getLocation();
+				int moveDirection = blocker.getDirection(wizardLocation, pathWeight);
+				
+				// If a blocker is on top of a wizard, block, else, move towards it.
+				if(blocker.getLocation().equals(wizard.getLocation())) {
+					blocker.block();
+				} else {
+					blocker.move(moveDirection);
+				}	
 			}
 		}
 	}

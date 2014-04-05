@@ -82,13 +82,30 @@ public class CompetitorAI implements AI {
 		else{ //Wizard cant see anything... Move in random direction for as long as possible
 			int myTeam = state.getMyTeamNumber();
 			int players = state.getNumberOfPlayers();
+			ArrayList<Node> enemyBases = new ArrayList<Node>();
 			for(int i = 1; i <= players; i++){
 				if(i != myTeam){
-					attackTeam = i;
-					break;
+					enemyBases.add(state.getBase(i));
 				}
 			}
-			Node enemyBase = state.getBase(attackTeam);
+			
+			Node enemyBase = enemyBases.get(0);
+			int maxHatCount = 0;
+			int hatCount = 0;
+			for(Node base : enemyBases){
+				ArrayList<Actor> hats = base.getActors();
+				for(Actor hat : hats){
+					if(hat.getType() == Actor.HAT){
+						hatCount++;
+					}
+				}
+				if(hatCount > maxHatCount){
+					maxHatCount = hatCount;
+					enemyBase = base;
+				}
+				hatCount = 0;
+			}
+			
 			path = wizard.getDirection(enemyBase, pathWeight);
 			wizard.move(path);
 			

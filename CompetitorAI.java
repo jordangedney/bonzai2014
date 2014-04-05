@@ -195,7 +195,7 @@ public class CompetitorAI implements AI {
 		ArrayList<Node> shortestPath = null;
 		for(Actor actor: state.getNeutralActors()){
 			if(!actor.equals(self)){
-				if (actor.getID() == target{
+				if (actor.getID() == target){
 					ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
 					if(newPath.size() < pathLength){
 						shortestPath = newPath;

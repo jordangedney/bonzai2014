@@ -160,4 +160,21 @@ public class CompetitorAI implements AI {
 			hat.move(path);
 		}
 	}
+	
+	// Given an actor, it returns the closest neutral actor.
+	private ArrayList<Node> closestNeutral(AIGameState state, Actor self) {		
+		int pathLength = 1000;
+		ArrayList<Node> shortestPath = null;
+		for(Actor actor: state.getNeutralActors()){
+			ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
+			if(newPath.size() < pathLength){
+				shortestPath = newPath;
+				pathLength = newPath.size();
+			}
+		}
+		return shortestPath;
+	}
+	
+	
+	
 }

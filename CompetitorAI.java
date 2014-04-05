@@ -32,7 +32,7 @@ public class CompetitorAI implements AI {
 	private void moveWizard(AIGameState state) {
 		Wizard wizard = state.getMyWizard();
 
-		if(state.getEnemyBlockers().size() != 0){ //Move towards enemy blockers and cast if can
+		if(state.getEnemyBlockers().size() != 0 && wizard.getMana() > 200){ //Move towards enemy blockers and cast if can
 			List<Blocker> blockers = state.getEnemyBlockers();
 
 			if(wizard.isAdjacent(blockers.get(0))){
@@ -58,7 +58,18 @@ public class CompetitorAI implements AI {
 			}
 			return;
 		}
-		
+		else if(state.getEnemyHats().size() != 0){ //Move towards enemy hats and cast if can
+			List<Hat> hats = state.getEnemyHats();
+
+			if(wizard.isAdjacent(hats.get(0))){
+				wizard.castMagic(hats.get(0));
+			}
+			else{
+				path = wizard.getDirection(hats.get(0).getLocation(), pathWeight);
+				wizard.move(path);
+			}
+			return;
+		}
 		else if(state.getNeutralHats().size() != 0){ //Move towards neutral hats and cast if can
 			List<Hat> neutralHats = state.getNeutralHats();
 

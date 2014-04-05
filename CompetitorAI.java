@@ -98,17 +98,26 @@ public class CompetitorAI implements AI {
 		else{ //Wizard cant see anything... Move in random direction for as long as possible
 			int myTeam = state.getMyTeamNumber();
 			int players = state.getNumberOfPlayers();
-			int attackTeam = 0;
 			for(int i = 1; i <= players; i++){
 				if(i != myTeam){
 					attackTeam = i;
 					break;
 				}
 			}
-
 			Node enemyBase = state.getBase(attackTeam);
 			path = wizard.getDirection(enemyBase, pathWeight);
 			wizard.move(path);
+			
+			ArrayList<Actor> enemyHat = enemyBase.getActors();
+			if(enemyHat.size() > 0 && enemyHat.get(0).getType() == Actor.HAT){
+				if(wizard.isAdjacent(enemyHat.get(0))){
+					wizard.castMagic(enemyHat.get(0));
+				}
+				else{
+					path = wizard.getDirection(enemyHat.get(0).getLocation(), pathWeight);
+					wizard.move(path);
+				}
+			}
 		}
 		
 	}

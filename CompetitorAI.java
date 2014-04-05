@@ -7,6 +7,8 @@ public class CompetitorAI implements AI {
 	int path = 0;
 	int last = 0;
 	
+	int attackTeam = 0;
+	
 	/**
 	 * You must have this function, all of the other functions in 
 	 * this class are optional.

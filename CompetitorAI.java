@@ -78,8 +78,20 @@ public class CompetitorAI implements AI {
 			}
 			return;
 		}
-		else{ //Wizard cant see anything... Move in random direction for as long as possible
-			wizard.shout("I dont know what to do!!");
+		else{ //Wizard cant see anything... Move toward enemy base
+			int myTeam = state.getMyTeamNumber();
+			int players = state.getNumberOfPlayers();
+			int attackTeam = 0;
+			for(int i = 1; i <= players; i++){
+				if(i != myTeam){
+					attackTeam = i;
+					break;
+				}
+			}
+	
+			Node enemyBase = state.getBase(attackTeam);
+			path = wizard.getDirection(enemyBase, pathWeight);
+			wizard.move(path);
 		}
 		
 	}

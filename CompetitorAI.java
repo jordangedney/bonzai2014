@@ -111,7 +111,7 @@ public class CompetitorAI implements AI {
 			wizard.move(path);
 			
 			ArrayList<Actor> enemyHat = enemyBase.getActors();
-			if(enemyHat.size() > 0 && enemyHat.get(0).getType() == Actor.HAT){
+			if(enemyHat.size() > 0 && enemyHat.get(0).getType() == Actor.HAT && enemyHat.get(0).getTeam() != myTeam){
 				if(wizard.isAdjacent(enemyHat.get(0))){
 					wizard.castMagic(enemyHat.get(0));
 				}

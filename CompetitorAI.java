@@ -93,13 +93,15 @@ public class CompetitorAI implements AI {
 			wizard.move(path);
 			
 			ArrayList<Actor> enemyHat = enemyBase.getActors();
-			if(enemyHat.size() > 0 && enemyHat.get(0).getType() == Actor.HAT && enemyHat.get(0).getTeam() != myTeam){
-				if(wizard.isAdjacent(enemyHat.get(0))){
-					wizard.castMagic(enemyHat.get(0));
-				}
-				else{
-					path = wizard.getDirection(enemyHat.get(0).getLocation(), pathWeight);
-					wizard.move(path);
+			for(Actor hat : enemyHat){
+				if(hat.getType() == Actor.HAT && hat.getTeam() != myTeam){
+					if(wizard.isAdjacent(hat) || wizard.getLocation() == enemyBase){
+						wizard.castMagic(hat);
+					}
+					else{
+						path = wizard.getDirection(hat.getLocation(), pathWeight);
+						wizard.move(path);
+					}
 				}
 			}
 		}

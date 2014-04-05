@@ -1,12 +1,11 @@
 import bonzai.api.*;
-
 import java.util.*;
-
 
 public class CompetitorAI implements AI {
 	
 	private WeightComparator pathWeight = new CompetitorWeightComparator();
-	private boolean firstTurn = true;
+	int path = 0;
+	int last = 0;
 	
 	/**
 	 * You must have this function, all of the other functions in 
@@ -14,52 +13,15 @@ public class CompetitorAI implements AI {
 	 */
 	@Override
 	public void takeTurn(AIGameState state) {
-		if(firstTurn) {
-			takeFirstTurn(state);
-			firstTurn = false;
-		}
-		
-		//Get all of your actors
-		for(Actor a : state.getMyActors()) {
-			//Move your actor in a random direction
-			//Note: Only the last action is applied to the game, with the
-			//      exception of a.shout().
-			//      Example, if you call a.move(Node.DOWN) and then a.move(Node.UP)
-			//      and then a.shout(), a.move(Node.UP) and a.shout() will 
-			//      be executed and a.move(Node.DOWN) will be ignored. 
-			a.move((int)(Math.random() * 4));
-			
-			//Type casting
-			if(a instanceof Wizard) {
-				//You probably shouldn't try to cast magic on yourself...
-				if(((Wizard)a).canCast(a)) {
-					if(((Wizard)a).castMagic(a)) {
-						((Wizard)a).shout("**Ouch**");
-					}
-				}
-			}
-			
-			if(a.isStunned()) {
-				a.shout("**Ouch**");
-			}
-		}
 		
 		this.moveWizard(state);
 		this.moveBlockers(state);
 		this.moveCleaners(state);
 		this.moveScouts(state);
 		this.moveHats(state);
+		
 	}
 	
-	/**
-	 * Executes only on your first turn.
-	 * @param state
-	 */
-	private void takeFirstTurn(AIGameState state) {
-		for(Actor a : state.getMyActors()) {
-			a.shout("Go Team!"); //Shout "Go Team!" for the first turn
-		}
-	}
 	
 	/**
 	 * Move or castMagic with your Wizard
@@ -67,28 +29,40 @@ public class CompetitorAI implements AI {
 	 */
 	private void moveWizard(AIGameState state) {
 		Wizard wizard = state.getMyWizard();
+		List<Hat> neutralHats = state.getNeutralHats();
 		
-		//Wizard Pathfinding
-		int moveDirection = wizard.getDirection(state.getNode(1, 1), pathWeight);
-		if(moveDirection != -1) { 
-			if(wizard.canMove(moveDirection)) {
-				wizard.move(moveDirection);
-				wizard.shout("Moving");
+		if(neutralHats.size() != 0){
+			if(wizard.isAdjacent(neutralHats.get(0))){
+				wizard.castMagic(neutralHats.get(0));
+			}
+			else{
+				path = wizard.getDirection(neutralHats.get(0).getLocation(), pathWeight);
+				wizard.move(path);
+			}
+		}
+		else{
+			if(last == 0){
+				wizard.move(Node.RIGHT);
+				//last = 1;
+			}
+			else if(last == 1){
+				wizard.move(Node.UP);
+				last = 0;
 			}
 		}
 		
 		//Iterate through all visible enemy actors
-		for(Actor e : state.getEnemyActors()) {
-			if(wizard.canCast( e)) {
-				wizard.castMagic(e);
-			}
-		}
-		
-		for(Actor e : state.getNeutralActors()) {
-			if(wizard.canCast(e)) {
-				wizard.castMagic(e);
-			}
-		}
+				for(Actor e : state.getEnemyActors()) {
+					if(wizard.canCast( e)) {
+						wizard.castMagic(e);
+					}
+				}
+				
+				for(Actor e : state.getNeutralActors()) {
+					if(wizard.canCast(e)) {
+						wizard.castMagic(e);
+					}
+				}
 	}
 	
 	/**
@@ -163,7 +137,8 @@ public class CompetitorAI implements AI {
 	 */
 	private void moveHats(AIGameState state) {
 		for(Hat hat : state.getMyHats()) {
-			//TODO: Your hat should probably do something
+			path = hat.getDirection(state.getMyBase(), pathWeight);
+			hat.move(path);
 		}
 	}
 }

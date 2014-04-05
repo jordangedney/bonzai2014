@@ -10,11 +10,11 @@ public class CompetitorWeightComparator implements WeightComparator
 	
 	@Override
 	public double compare(Node arg0) {
-		List<Actor> actors = arg0.getActors();
-		for(Actor a : actors){
-			if(a instanceof Blocker)
-				return 99;
+		
+		if(arg0.isPassable() == false){
+			return 99;
 		}
+		
 		return 0;
 	}
 }

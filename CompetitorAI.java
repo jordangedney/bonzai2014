@@ -112,7 +112,9 @@ public class CompetitorAI implements AI {
 				
 				// If a blocker is on top of a wizard, block, else, move towards it.
 				if(blocker.getLocation().equals(wizard.getLocation())) {
-					blocker.block();
+					if(!blocker.getLocation().equals(state.getMyWizard())){
+						blocker.block();	
+					}
 				} else {
 					blocker.move(moveDirection);
 				}	

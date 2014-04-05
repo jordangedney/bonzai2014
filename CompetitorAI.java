@@ -199,6 +199,26 @@ public class CompetitorAI implements AI {
 		return shortestPath;
 	}
 	
+	// Given an actor (self),  an arraylist of actors, and an int target,
+	// it will return the path of the closest actor to self, from actors of type target.
+	private ArrayList<Node> closestTarget(AIGameState state, ArrayList<Actor> actorSet, Actor self, int target) {		
+		int pathLength = 1000;
+		ArrayList<Node> shortestPath = null;
+		for(Actor actor: actorSet){
+			if(!actor.equals(self)){
+				if (actor.getID() == target){
+					ArrayList<Node> newPath = state.getPath(self, actor.getLocation(), pathWeight);
+					if(newPath.size() < pathLength){
+						shortestPath = newPath;
+						pathLength = newPath.size();
+					}
+				}
+			}
+		}
+		return shortestPath;
+	}
+	
+	
 	
 	private ArrayList<Node> closestNeutralTarget(AIGameState state, Actor self, int target) {		
 		int pathLength = 1000;
